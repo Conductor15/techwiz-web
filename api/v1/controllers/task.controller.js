@@ -134,3 +134,22 @@ module.exports.create = async (req, res) => {
         });
     }
 };
+
+// [PATCH] /api/v1/tasks/edit/:id
+module.exports.edit = async (req, res) => {
+    try {
+       const id = req.params.id;
+
+       await Task.updateOne({_id: id},req.body);
+
+       res.json({
+        code:200,
+        message: "Update Successfully!"
+    });
+    } catch (error) {
+        res.json({
+            code:400,
+            message: "ERROR!"
+        });
+    }
+};

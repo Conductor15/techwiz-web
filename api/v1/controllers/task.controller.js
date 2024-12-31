@@ -1,11 +1,20 @@
 const Task = require("../models/task.model");
 const paginationHelper = require("../../../helpers/pagination");
+const searchHelper = require("../../../helpers/search");
+
 // [GET] /api/v1/tasks
 module.exports.index = async (req, res) => {
     const find = {deleted: false};
 
+    //status filter
     if(req.query.status){
         find.status = req.query.status;
+    }
+
+    //search
+    const objectSearch = searchHelper(req.query);
+    if(objectSearch.regex){
+        find.title = objectSearch.regex;
     }
 
     //pagination
@@ -25,6 +34,7 @@ module.exports.index = async (req, res) => {
         sort[req.query.sortKey] = req.query.sortValue;
     }
     //End sort
+
     const tasks = await Task.find(find)
     .sort(sort)
     .limit(objectPagination.limitItems)
@@ -46,5 +56,29 @@ module.exports.detail = async (req, res) => {
         res.json(task);
     } catch (error) {
         res.json("Không tìm thấy!");
+    }
+};
+
+// [PATCH] /api/v1/tasks/change-status/:id
+module.exports.changeStatus = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const status = req.body.status;
+
+        await Task.updateOne({
+            _id: id
+        },{
+            status: status
+        });
+
+        res.json({
+            code:200,
+            message: "Update successfully!"
+        });
+    } catch (error) {
+        res.json({
+            code:400,
+            message: "ERROR!"
+        });
     }
 };

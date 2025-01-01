@@ -13,6 +13,7 @@ app.use(cors());
 database.connect();
 
 app.use(bodyParser.json());
+
 app.use(cookieParser());
 // Routes version 1
 routesApiVer1(app);

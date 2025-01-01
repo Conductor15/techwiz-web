@@ -42,3 +42,36 @@ module.exports.register = async (req, res) => {
         });
     }
 };
+
+// [POST] /api/v1/users/login
+module.exports.login = async (req, res) => {
+    const user = await User.findOne({
+        email: req.body.email
+    });
+
+    if(!user){
+        res.json({
+            code: 400,
+            message: "Email doesn't exist"
+        });
+        return;
+    }
+
+    const pass = req.body.password;
+    if(md5(pass) !== user.password){
+        res.json({
+            code: 400,
+            message: "Ưởng password"
+        });
+        return;
+    }
+
+    const token = user.token;
+    res.cookie("token", token);
+
+    res.json({
+        code: 200,
+        message: "Login successfully",
+        token: token
+    })
+};
